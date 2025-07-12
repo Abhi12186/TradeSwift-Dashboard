@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+// dashboard/src/App.js
+import React from "react";
+import jwt_decode from "jwt-decode";
+import Dashboard from "./components/Home"; // या जहां Dashboard actual है
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "http://localhost:3000";
+    return null;
+  }
+
+  try {
+    const decoded = jwt_decode(token);
+    const now = Date.now() / 1000;
+    if (decoded.exp < now) {
+      localStorage.removeItem("token");
+      window.location.href = "http://localhost:3000";
+      return null;
+    }
+  } catch (e) {
+    localStorage.removeItem("token");
+    window.location.href = "http://localhost:3000";
+    return null;
+  }
+
+  return <Dashboard />;
 }
 
 export default App;
